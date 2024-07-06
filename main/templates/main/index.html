@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Table Page</title>
+    {% load static %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'main/css/main.css' %}">
+</head>
+<body>
+    <div class="container">
+        <form method="POST" action="{% url 'pars_page' %}" class="form-inline">
+            {% csrf_token %}
+            <div class="form-group mb-2">
+                <label for="zap" class="sr-only">Запрос</label>
+                <input type="text" class="form-control" id="zap" name="zap" placeholder="Введите запрос" required>
+                <label for="exp" class="sr-only">Опыт работы</label>
+                 <select class="form-select" id="exp" name="exp">
+                     <option value="">Выберите опыт работы(любой)</option>
+                     <option value="noExperience">Нет опыта</option>
+                     <option value="between1And3">От 1 года до 3 лет</option>
+                     <option value="between3And6">ПОт 3 до 6 лет</option>
+                     <option value="moreThan6">Более 6 лет</option>
+                </select>
+                <label for="empl" class="sr-only">Тип занятости</label>
+                 <select class="form-select" id="empl" name="empl">
+                     <option value="">Выберите тип занятости(любой)</option>
+                     <option value="full">Полная занятость</option>
+                     <option value="part">Частичная занятость</option>
+                     <option value="project">Проектная работа</option>
+                     <option value="volunteer">Волонтерство</option>
+                     <option value="probation">Стажировка</option>
+                </select>
+                <label for="grap" class="sr-only">График работы</label>
+                 <select class="form-select" id="grap" name="grap">
+                     <option value="">Выберите график работы(любой)</option>
+                     <option value="fullDay">Полный день</option>
+                     <option value="shift">Сменный график</option>
+                     <option value="flexible">Гибкий график</option>
+                     <option value="remote">Удаленная работа</option>
+                     <option value="flyInFlyOut">Вахтовый метод</option>
+                </select>
+                <label for="sort" class="sr-only">Сортировка</label>
+                 <select class="form-select" id="sort" name="sort">
+                     <option value="">Выберите тип сортировки(по умолчанию)</option>
+                     <option value="publication_time">по дате</option>
+                     <option value="salary_desc">по убыванию дохода</option>
+                     <option value="salary_asc">по возрастанию дохода</option>
+                     <option value="relevance">по соответствию</option>
+                     <option value="distance">по удалённости</option>
+                </select>
+
+            <div class="form-group mb-2">
+                <label for="code" class="sr-only">Код региона</label>
+                <select class="form-select" id="code" name="code" required>
+                    {% for code in codes %}
+                    <option value="">Выберите код региона</option>
+                    <option value=" {{ code.code }} ">{{ code.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary mb-2">Начать парсинг</button>
+        </form>
+
+        <div class="table-container">
+            <table class="table table-dark table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Company</th>
+                        <th>URL</th>
+                        <th>Salary</th>
+                        <th>work schedule</th>
+                        <th>experience</th>
+                        <th>requirement</th>
+                        <th>responsibility</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in table_data %}
+                    <tr>
+                        <td>{{ row.id }}</td>
+                        <td>{{ row.title }}</td>
+                        <td>{{ row.company }}</td>
+                        <td><a href="{{ row.url }}" target="_blank">{{ row.url }}</a></td>
+                        <td>{{ row.salary }}</td>
+                        <td>{{ row.grafic }}</td>
+                        <td>{{ row.experience }}</td>
+                        <td class = "per">
+                            <p class = "text">{{ row.requirement }}</p>
+                            <a class = 'button'>Показать</a>
+                        </td>
+                        <td class = "per">
+                            <p class = "text">{{ row.responsibility }}</p>
+                            <a class = 'button'>Показать</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+         <span class="step-links">
+        {% if table_data.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+            <a href="?page={{ table_data.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ table_data.number }} of {{ table_data.paginator.num_pages }}.
+        </span>
+
+        {% if table_data.has_next %}
+            <a href="?page={{ table_data.next_page_number }}">next</a>
+            <a href="?page={{ table_data.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+    <script src="{% static 'main/js/main.js' %}"></script>
+    </div>
+</body>
